@@ -12,8 +12,6 @@
 
 	require __DIR__ . "/../vendor/autoload.php";
 	require "model/shop.php";
-	require_once "config/config_category.php";
-	require_once "config/config_product.php";
 	require_once "config/config.php";
 
 	$app = AppFactory::create();

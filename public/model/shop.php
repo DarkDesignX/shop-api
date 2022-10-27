@@ -56,10 +56,10 @@
 		return true;
 	}
 
-	function create_new_product($sku, $active, $name, $image, $description, $price, $stock) {
+	function create_new_product($sku, $active, $id_category, $name, $image, $description, $price, $stock) {
 		global $database_product;
 
-		$result = $database_product->query("INSERT INTO product(sku, active, name, image, description, price, stock) VALUES('$sku', $active, '$name', '$image', '$description', $price, $stock)");
+		$result = $database_product->query("INSERT INTO product(sku, active, id_category, name, image, description, price, stock) VALUES('$sku', $active, $id_category, '$name', '$image', '$description', $price, $stock)");
 
 		if (!$result) {
 			return false;
@@ -116,10 +116,10 @@
 		return true;
 	}
 
-	function update_product($product_id, $sku, $active, $name, $image, $description, $price, $stock) {
+	function update_product($product_id, $sku, $active, $id_category, $name, $image, $description, $price, $stock) {
 		global $database_product;
 
-		$result = $database_product->query("UPDATE product SET sku = '$sku', active = $active, name = '$name', image = '$image',  description = '$description', price = $price, stock = $stock WHERE product_id = $product_id");
+		$result = $database_product->query("UPDATE product SET sku = '$sku', active = $active, id_category = $id_category, name = '$name', image = '$image',  description = '$description', price = $price, stock = $stock WHERE product_id = $product_id");	
 
 		if (!$result) {
 			return false;

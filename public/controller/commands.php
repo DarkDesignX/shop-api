@@ -183,7 +183,7 @@
 		$name = strip_tags(addslashes($request_data["name"]));
 		$image = strip_tags(addslashes($request_data["image"]));
 		$description = strip_tags(addslashes($request_data["description"]));
-		$price = intval($request_data["price"]);
+		$price = $request_data["price"];
 		$stock = intval($request_data["stock"]);
 
 		if (empty($sku)) {
@@ -226,14 +226,14 @@
 		if (strlen($image) > 1000) {
 			error("The image data is too long. Please enter less than or equal to 1000 characters.", 400);
 		}
-		if ($price < 0 || $price > 65.2) {
-			error("The price must be between 0 and 65,2 dollars.", 400);
+		if ($price < 0 ) {
+			error("The price must be higher than 0 dollars.", 400);
 		}
 		if (is_float($stock)) {
 			error("The stock must not have decimals.", 400);
 		}
 
-		if (create_new_product($sku, $active, $name, $image, $description, $price, $stock) === true) {
+		if (create_new_product($sku, $active, $id_category, $name, $image, $description, $price, $stock) === true) {
 			http_response_code(201);
 			echo "A new product has been created";
 		}
@@ -384,7 +384,7 @@
 		if (!isset($request_data["active"]) || !is_numeric($request_data["active"])) {
 			error("Please provide an integer number for the \"active\" field.", 400);
 		}
-		if (!isset($request_data["name"])) {
+		if (isset($request_data["name"])) {
 			$name = strip_tags(addslashes($request_data["name"]));
 
 			if (empty($name)) {
@@ -468,19 +468,162 @@
 	 */
 
 
-	/** 
-	 * 
-	 * $app->put("/Product/{product_id}", function (Request $request, Response $response, $args) {
-	 *	require "controller/authentication.php";
-	 *
-	 *	$product_id = intval($args["product_id"]);
- 	 *
-	 *	$product = get_product($product_id);
-	 *
-	 * });
-	 *
-	 */
+
+	$app->put("/Product/{product_id}", function (Request $request, Response $response, $args) {
+		require "controller/authentication.php";
+
+		$product_id = intval($args["product_id"]);
+
+		$product = get_product($product_id);
+
+		if (!$product) {
+			error("No product found for the ID " . $product_id . ".", 404);
+		}
+		else if (is_string($product)) {
+			error($product, 500);
+		}
+
+		$request_body_string = file_get_contents("php://input");
+
+		$request_data = json_decode($request_body_string, true);
+
+		if (isset($request_data["sku"])) {
+			$sku = strip_tags(addslashes($request_data["sku"]));
+
+			if (empty($sku)) {
+				error("The \"sku\" field must not be empty.", 400);
+			}
 	
+			if (strlen($sku) > 100) {
+				error("The sku is too long. Please enter less than or equal to 100 characters.", 400);
+			}
+
+			$product["sku"] = $sku;
+		}
+
+		if (!isset($request_data["active"]) || !is_numeric($request_data["active"])) {
+			error("Please provide an integer number for the \"active\" field.", 400);
+
+			$product["active"] = $active;
+		}
+
+		if (!isset($request_data["id_category"]) || !is_numeric($request_data["id_category"])) {
+			error("Please provide an integer number for the \"id_category\" field.", 400);
+			
+			$product["id_category"] = $id_category;
+		}
+
+		if (isset($request_data["name"])) {
+			$name = strip_tags(addslashes($request_data["name"]));
+
+			if (empty($name)) {
+				error("The \"name\" field must not be empty.", 400);
+			}
+	
+			if (strlen($name) > 500) {
+				error("The name is too long. Please enter less than or equal to 500 characters.", 400);
+			}
+
+			$product["name"] = $name;
+		}
+
+		if (isset($request_data["image"])) {
+			$image = strip_tags(addslashes($request_data["image"]));
+
+			if (empty($image)) {
+				error("The \"image\" field must not be empty.", 400);
+			}
+	
+			if (strlen($image) > 1000) {
+				error("The image is too long. Please enter less than or equal to 1000 characters.", 400);
+			}
+
+			$product["image"] = $image;
+		}
+
+		if (isset($request_data["description"])) {
+			$description = strip_tags(addslashes($request_data["description"]));
+
+			if (empty($description)) {
+				error("The \"description\" field must not be empty.", 400);
+			}
+
+			$product["description"] = $description;
+		}
+
+		if (!isset($request_data["price"]) || !is_numeric($request_data["price"])) {
+			error("Please provide an integer number for the \"price\" field.", 400);
+		}
+
+		if (!isset($request_data["stock"]) || !is_numeric($request_data["stock"])) {
+			error("Please provide an integer number for the \"stock\" field.", 400);
+		}
+
+		if (isset($request_data["active"])) {
+			if (!is_numeric($request_data["active"])) {
+				error("Please provide an integer number for the \"active\" field.", 400);
+			}
+
+			$active = intval($request_data["active"]);
+
+			if (is_float($active)) {
+				error("The active field must not have decimals.", 400);
+			}
+
+			$active = intval($request_data["active"]);
+
+			$product["active"] = $active;
+		}
+
+		if (isset($request_data["id_category"])) {
+			if (!is_numeric($request_data["id_category"])) {
+				error("Please provide an integer number for the \"id_category\" field.", 400);
+			}
+
+			$id_category = intval($request_data["id_category"]);
+
+			if (is_float($id_category)) {
+				error("The id_category field must not have decimals.", 400);
+			}
+
+			$id_category = intval($request_data["id_category"]);
+
+			$product["id_category"] = $id_category;
+		}
+
+		if (isset($request_data["price"])) {
+			if (!is_numeric($request_data["price"])) {
+				error("Please provide an integer number for the \"price\" field.", 400);
+			}
+
+			$price = $request_data["price"];
+
+			$product["price"] = $price;
+		}
+
+		if (isset($request_data["stock"])) {
+			if (!is_numeric($request_data["stock"])) {
+				error("Please provide an integer number for the \"stock\" field.", 400);
+			}
+
+			$stock = intval($request_data["stock"]);
+
+			if (is_float($stock)) {
+				error("The stock field must not have decimals.", 400);
+			}
+
+			$product["stock"] = $stock;
+		}
+
+		if (update_product($product_id, $product["sku"], $product["active"], $product["id_category"], $product["name"], $product["image"], $product["description"], $product["price"], $product["stock"])) {
+			echo "The product has been successfully updated";
+		}
+		else {
+			error("An error occurred while saving the product data.", 500);
+		}
+
+		return $response;
+	});
 
 	/**
      * @OA\Delete(

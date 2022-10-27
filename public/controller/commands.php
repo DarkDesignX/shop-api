@@ -182,7 +182,7 @@
 		$id_category = intval($request_data["id_category"]);
 		$name = strip_tags(addslashes($request_data["name"]));
 		$image = strip_tags(addslashes($request_data["image"]));
-		$name = strip_tags(addslashes($request_data["description"]));
+		$description = strip_tags(addslashes($request_data["description"]));
 		$price = intval($request_data["price"]);
 		$stock = intval($request_data["stock"]);
 
@@ -315,7 +315,7 @@
 
 		$product_id = intval($args["product_id"]);
 
-		$product = get_category($product_id);
+		$product = get_product($product_id);
 
 		if (!$product) {
 			error("No category found for the ID " . $product_id . ".", 404);
